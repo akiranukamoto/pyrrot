@@ -83,7 +83,6 @@ celerybeat-schedule
 .env
 
 # virtualenv
-.venv
 .venv/
 venv/
 ENV/
@@ -102,4 +101,3 @@ ENV/
 .mypy_cache/
 
 .idea/
-__pycache__/
