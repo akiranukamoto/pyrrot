@@ -1,11 +1,12 @@
 import json
 import os
+import uuid
 from http import HTTPStatus
 
 import yaml
 from apispec import APISpec
 from flask import Flask, jsonify, request
-from flask_apispec import FlaskApiSpec, doc
+from flask_apispec import FlaskApiSpec, doc, use_kwargs, marshal_with
 
 from schema import ConfigSchema
 
@@ -58,6 +59,12 @@ def get_request(path=''):
     return _build_response(list(filter(_comparisons(path), configs))[0])
 
 
+def find_config_by_id(id):
+    for config in configs:
+        if str(id) == config['id']:
+            return config
+
+
 METHODS = ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'PATCH', 'TRACE', 'OPTIONS']
 
 
@@ -82,7 +89,6 @@ def _load_config(file):
 
 def _read_configs(path):
     configs = []
-    id = 0
     if os.path.isfile(path):
         configs = _load_config(path)
     elif os.path.isdir(path):
@@ -90,8 +96,7 @@ def _read_configs(path):
             if file.endswith(".yaml") or file.endswith(".yml"):
                 configs += _load_config(os.path.join(path, file))
     for config in configs:
-        id += 1
-        config['id'] = id
+        config['id'] = str(uuid.uuid4())
     return configs
 
 
@@ -106,25 +111,35 @@ def _add_url_rules(app):
 
     @app.route('/pyrrot', methods=['POST'])
     @doc(tags=['configuration'], description='Insert new endpoint.')
-    def post_config():
-        return get_request()
+    @use_kwargs(ConfigSchema)
+    @marshal_with(ConfigSchema)
+    def post_config(**kwargs):
+        kwargs['id'] = str(uuid.uuid4())
+        configs.append(kwargs)
+        return kwargs, HTTPStatus.CREATED
 
-    @app.route('/pyrrot', methods=['DELETE'])
+    @app.route('/pyrrot/<uuid:id>', methods=['DELETE'])
     @doc(tags=['configuration'], description='Delete endpoint.')
-    def delete_config():
-        return get_request()
+    def delete_config(id):
+        config = find_config_by_id(id)
+        if config:
+            configs.remove(config)
+            return '', HTTPStatus.OK
+        return '', HTTPStatus.NOT_FOUND
 
     @app.route('/pyrrot', methods=['GET'])
     @doc(tags=['configuration'], description='Get all endpoints.')
+    @marshal_with(ConfigSchema(many=True))
     def get_all_config():
         return configs
 
-    @app.route('/pyrrot/<int:id>', methods=['GET'])
+    @app.route('/pyrrot/<uuid:id>', methods=['GET'])
     @doc(tags=['configuration'], description='Get endpoint by id.')
+    @marshal_with(ConfigSchema)
     def get_by_id_config(id):
-        for config in configs:
-            if id == config['id']:
-                return config
+        config = find_config_by_id(id)
+        if config:
+            return config
         return '', HTTPStatus.NOT_FOUND
 
     app.config.update({
