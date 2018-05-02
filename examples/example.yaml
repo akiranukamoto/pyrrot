@@ -1,0 +1,39 @@
+- name: "Get users"
+  description: ""
+  when:
+    path: /users
+    method: GET
+    type: application/json
+    header:
+      TRACKID: abc123456
+    query:
+      foo: bar
+  then:
+    type: application/json
+    header:
+      TRACKID: abc123456
+    body:
+      name: John Doe
+      identity: 666
+    code: 200
+- name: "Insert companies"
+  description: ""
+  when:
+    path: /companies
+    method: GET
+    type: application/json
+    header:
+      TRACKID: abc123456
+    body:
+      name: Oracle
+      identity: 999
+    query:
+      foo: bar
+  then:
+    type: application/json
+    header:
+      TRACKID: abc123456
+    body:
+      name: Oracle
+      identity: 999
+    code: 201

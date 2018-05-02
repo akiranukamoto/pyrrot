@@ -1,0 +1,28 @@
+- name: "Insert users"
+  description: ""
+  when:
+    path: /users
+    method: POST
+    type: application/json
+    body:
+      name: John Doe
+      identity: 666
+  then:
+    type: application/json
+    header:
+      TRACKID: abc123456
+    body:
+      name: John Doe
+      identity: 666
+    code: 201
+- name: "Insert companies"
+  description: ""
+  when:
+    path: /companies
+    method: GET
+    type: application/json
+  then:
+    type: application/json
+    header:
+      TRACKID: abc123456
+    code: 200
