@@ -3,7 +3,9 @@ import os
 from http import HTTPStatus
 
 import yaml
+from apispec import APISpec
 from flask import Flask, jsonify, request
+from flask_apispec import FlaskApiSpec, doc
 
 from schema import ConfigSchema
 
@@ -80,7 +82,7 @@ def _load_config(file):
 
 def _read_configs(path):
     configs = []
-    index = 0
+    id = 0
     if os.path.isfile(path):
         configs = _load_config(path)
     elif os.path.isdir(path):
@@ -88,14 +90,56 @@ def _read_configs(path):
             if file.endswith(".yaml") or file.endswith(".yml"):
                 configs += _load_config(os.path.join(path, file))
     for config in configs:
-        index += 1
-        config['index'] = index
+        id += 1
+        config['id'] = id
     return configs
 
 
 def _add_url_rules(app):
-    app.add_url_rule('/', '', get_request, methods=METHODS)
-    app.add_url_rule('/<path:path>', '', get_request, methods=METHODS)
+    @app.route('/', methods=METHODS)
+    def get_request_without_path():
+        return get_request()
+
+    @app.route('/<path:path>', methods=METHODS)
+    def get_request_with_path(path):
+        return get_request(path)
+
+    @app.route('/pyrrot', methods=['POST'])
+    @doc(tags=['configuration'], description='Insert new endpoint.')
+    def post_config():
+        return get_request()
+
+    @app.route('/pyrrot', methods=['DELETE'])
+    @doc(tags=['configuration'], description='Delete endpoint.')
+    def delete_config():
+        return get_request()
+
+    @app.route('/pyrrot', methods=['GET'])
+    @doc(tags=['configuration'], description='Get all endpoints.')
+    def get_all_config():
+        return configs
+
+    @app.route('/pyrrot/<int:id>', methods=['GET'])
+    @doc(tags=['configuration'], description='Get endpoint by id.')
+    def get_by_id_config(id):
+        for config in configs:
+            if id == config['id']:
+                return config
+        return '', HTTPStatus.NOT_FOUND
+
+    app.config.update({
+        'APISPEC_SPEC': APISpec(
+            title='Pyrrot Apis',
+            version='v1',
+            plugins=['apispec.ext.marshmallow'],
+        ),
+        'APISPEC_SWAGGER_URL': '/swagger/',
+    })
+    docs = FlaskApiSpec(app)
+    docs.register(post_config)
+    docs.register(delete_config)
+    docs.register(get_all_config)
+    docs.register(get_by_id_config)
 
 
 def _register_exceptions(app):
