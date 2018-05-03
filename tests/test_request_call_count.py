@@ -6,7 +6,7 @@ import main
 @pytest.fixture
 def client(url_example_example):
     app = main.create_app(debug=True)
-    main.configs = main._read_configs(url_example_example)
+    main.configs = main._read_configs(app, url_example_example)
     yield app.test_client()
 
 

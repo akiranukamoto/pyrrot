@@ -10,8 +10,6 @@ from flask_apispec import FlaskApiSpec, doc, use_kwargs, marshal_with
 
 from schema import ConfigSchema
 
-configs = []
-
 
 def _comparisons(path):
     def _compare_simple_dict(config, request):
@@ -51,15 +49,17 @@ def _comparisons(path):
 
 def _build_response(value):
     then = value.get('then')
-    then.get('header')['call_count'] = then.get('header', {}).get('call_count', 0) + 1
     return jsonify(then.get('body')), then.get('code'), then.get('header')
 
 
-def get_request(path=''):
-    return _build_response(list(filter(_comparisons(path), configs))[0])
+def get_request(app, path=''):
+    selected_config = list(filter(_comparisons(path), app.config['PYRROT_CONFIG']))[0]
+    selected_config['then']['header']['call_count'] = app.config['PYRROT_CALL_COUNT'][selected_config['id']] + 1
+    app.config['PYRROT_CALL_COUNT'][selected_config['id']] = app.config['PYRROT_CALL_COUNT'][selected_config['id']] + 1
+    return _build_response(selected_config)
 
 
-def find_config_by_id(id):
+def find_config_by_id(configs, id):
     for config in configs:
         if str(id) == config['id']:
             return config
@@ -87,8 +87,10 @@ def _load_config(file):
             raise RuntimeError(exc)
 
 
-def _read_configs(path):
+def _read_configs(app, path):
     configs = []
+    app.config['PYRROT_CALL_COUNT'] = {}
+
     if os.path.isfile(path):
         configs = _load_config(path)
     elif os.path.isdir(path):
@@ -97,17 +99,19 @@ def _read_configs(path):
                 configs += _load_config(os.path.join(path, file))
     for config in configs:
         config['id'] = str(uuid.uuid4())
+        app.config['PYRROT_CALL_COUNT'][config['id']] = 0
+    app.config['PYRROT_CONFIG'] = configs
     return configs
 
 
 def _add_url_rules(app):
     @app.route('/', methods=METHODS)
     def get_request_without_path():
-        return get_request()
+        return get_request(app)
 
     @app.route('/<path:path>', methods=METHODS)
     def get_request_with_path(path):
-        return get_request(path)
+        return get_request(app, path)
 
     @app.route('/pyrrot', methods=['POST'])
     @doc(tags=['configuration'], description='Insert new endpoint.')
@@ -115,15 +119,16 @@ def _add_url_rules(app):
     @marshal_with(ConfigSchema)
     def post_config(**kwargs):
         kwargs['id'] = str(uuid.uuid4())
-        configs.append(kwargs)
+        app.config['PYRROT_CALL_COUNT'][kwargs['id']] = 0
+        app.config['PYRROT_CONFIG'].append(kwargs)
         return kwargs, HTTPStatus.CREATED
 
     @app.route('/pyrrot/<uuid:id>', methods=['DELETE'])
     @doc(tags=['configuration'], description='Delete endpoint.')
     def delete_config(id):
-        config = find_config_by_id(id)
+        config = find_config_by_id(app.config['PYRROT_CONFIG'], id)
         if config:
-            configs.remove(config)
+            app.config['PYRROT_CONFIG'].remove(config)
             return '', HTTPStatus.OK
         return '', HTTPStatus.NOT_FOUND
 
@@ -131,13 +136,13 @@ def _add_url_rules(app):
     @doc(tags=['configuration'], description='Get all endpoints.')
     @marshal_with(ConfigSchema(many=True))
     def get_all_config():
-        return configs
+        return app.config['PYRROT_CONFIG']
 
     @app.route('/pyrrot/<uuid:id>', methods=['GET'])
     @doc(tags=['configuration'], description='Get endpoint by id.')
     @marshal_with(ConfigSchema)
     def get_by_id_config(id):
-        config = find_config_by_id(id)
+        config = find_config_by_id(app.config['PYRROT_CONFIG'], id)
         if config:
             return config
         return '', HTTPStatus.NOT_FOUND
@@ -167,6 +172,6 @@ def _register_exceptions(app):
 
 if __name__ == "__main__":
     examples = os.path.dirname(__file__)
-    configs = _read_configs(os.path.join(examples, "examples"))
     app = create_app(debug=True)
+    _read_configs(app, os.path.join(examples, "examples"))
     app.run(port=1234)

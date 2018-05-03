@@ -9,7 +9,7 @@ import main
 def client():
     def make_client(path):
         app = main.create_app(debug=True)
-        main.configs = main._read_configs(path)
+        main._read_configs(app, path)
         return app.test_client()
 
     yield make_client
