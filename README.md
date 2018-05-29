@@ -29,7 +29,8 @@ Assumindo que você tenha o python 3.6 instalado.
 
 Um simple exemplo de um yml para a configuração de uma api:
 
-```- name: "Get users"
+```
+- name: "Get users"
   description: ""
   when:
     path: users
@@ -52,7 +53,8 @@ Um simple exemplo de um yml para a configuração de uma api:
 ### Regex:
 Path, header, body e query aceitam regex:
 
-```- name: "Insert customers"
+```
+- name: "Insert customers"
   description: ""
   when:
     path: $regex=.*customers.*
