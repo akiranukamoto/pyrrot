@@ -1,0 +1,35 @@
+- name: "Insert customers"
+  description: ""
+  when:
+    path: $regex=.*customers.*
+    method: POST
+    type: application/json
+    header:
+      TRACKID: $regex=.*access.*
+    body:
+      name: $regex=(?i).*Cola.*
+      identity: $regex=^([2-9]|1[0-6])$
+  then:
+    type: application/json
+    header:
+      TRACKID: abc123456
+    body:
+      name: Coca Cola
+      identity: 1234567
+    code: 201
+- name: "Get customers"
+  description: ""
+  when:
+    path: customers
+    method: GET
+    type: application/json
+    query:
+      fruta: $regex=.*laranja.*
+  then:
+    type: application/json
+    header:
+      TRACKID: abc123456
+    body:
+      name: Coca Cola
+      identity: 1234567
+    code: 200

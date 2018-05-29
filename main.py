@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import uuid
 from http import HTTPStatus
 
@@ -13,24 +14,35 @@ from schema import ConfigSchema
 
 def _comparisons(path):
     def _compare_simple_dict(config, request):
-        return sorted(config.items()) == sorted(request.items())
+        if len(config.items()) == len(request.items()):
+            for k, v in config.items():
+                if (str(v).startswith('$regex=') and not re.match(v[7:].replace("\\", "\\\\"), str(request[k]))) or (
+                            not str(v).startswith('$regex=') and v != request[k]):
+                    return False
+            return True
+        return False
 
     def _compare_path(config, request):
-        return config is None or '/{}'.format(request) == config
+        if config and str(config).startswith('$regex='):
+            return re.match(config[7:].replace("\\", "\\\\"), request)
+        return config is None or request == config
 
     def _compare_method(config, request):
         return request == config
 
     def _compare_headers(config, request):
         request_upper = {k.upper(): v for k, v in request.items()}
-        return len(config) == len(set(config.items()) & set(request_upper.items()))
+        for k, v in config.items():
+            if (str(v).startswith('$regex=') and not re.match(v[7:].replace("\\", "\\\\"), request_upper[k])) or (
+                        not str(v).startswith('$regex=') and v != request_upper[k]):
+                return False
+        return True
 
     def _compare_type(config, request):
         return request == config
 
     def _compare_body(config, request):
-        teste = _compare_simple_dict(config, request)
-        return teste
+        return _compare_simple_dict(config, request)
 
     def _compare_query(config, request):
         return _compare_simple_dict(config, request)

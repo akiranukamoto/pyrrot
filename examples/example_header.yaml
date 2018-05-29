@@ -1,7 +1,7 @@
 - name: "Get users"
   description: ""
   when:
-    path: /users
+    path: users
     method: GET
     type: application/json
     header:
@@ -18,7 +18,7 @@
 - name: "Insert companies"
   description: ""
   when:
-    path: /companies
+    path: companies
     method: GET
     type: application/json
   then:

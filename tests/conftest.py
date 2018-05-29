@@ -38,3 +38,8 @@ def url_example_query():
 @pytest.fixture
 def url_example_path():
     return os.path.join(os.path.dirname(__file__), "../examples/example_path.yaml")
+
+
+@pytest.fixture
+def url_example_regex():
+    return os.path.join(os.path.dirname(__file__), "../examples/example_regex.yaml")
