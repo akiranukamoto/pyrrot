@@ -16,9 +16,13 @@ def _comparisons(path):
     def _compare_simple_dict(config, request):
         if len(config.items()) == len(request.items()):
             for k, v in config.items():
-                if (str(v).startswith('$regex=') and not re.match(v[7:].replace("\\", "\\\\"), str(request[k]))) or (
-                            not str(v).startswith('$regex=') and v != request[k]):
-                    return False
+                if isinstance(v, dict):
+                    return _compare_simple_dict(v, request[k])
+                else:
+                    if (str(v).startswith('$regex=') and not re.match(v[7:].replace("\\", "\\\\"),
+                                                                      str(request[k]))) or (
+                                not str(v).startswith('$regex=') and v != request[k]):
+                        return False
             return True
         return False
 

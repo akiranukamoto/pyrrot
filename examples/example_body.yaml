@@ -7,6 +7,9 @@
     body:
       name: John Doe
       identity: 666
+      address:
+        street: White River
+        number: 321
   then:
     type: application/json
     header:

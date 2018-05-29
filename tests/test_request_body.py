@@ -3,7 +3,11 @@ from flask import json
 
 
 def test_with_body(client, url_example_body):
-    response = client(url_example_body).post('/users', data=json.dumps({'name': 'John Doe', 'identity': 666}),
+    response = client(url_example_body).post('/users', data=json.dumps({
+        'name': 'John Doe', 'identity': 666, 'address': {
+            'number': 321,
+            'street': 'White River'
+        }}),
                                              content_type='application/json')
     data = json.loads(response.get_data(as_text=True))
     assert 201 == response.status_code
