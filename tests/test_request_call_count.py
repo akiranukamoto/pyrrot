@@ -1,12 +1,13 @@
 import pytest
 
-import main
+from src._pyrrot import main
+from src._pyrrot.config import read_configs
 
 
 @pytest.fixture
 def client(url_example_example):
     app = main.create_app(debug=True)
-    main.configs = main._read_configs(app, url_example_example)
+    main.configs = read_configs(app, url_example_example)
     yield app.test_client()
 
 

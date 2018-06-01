@@ -2,14 +2,15 @@ import os
 
 import pytest
 
-import main
+from src._pyrrot import main
+from src._pyrrot.config import read_configs
 
 
 @pytest.fixture
 def client():
     def make_client(path):
         app = main.create_app(debug=True)
-        main._read_configs(app, path)
+        read_configs(app, path)
         return app.test_client()
 
     yield make_client
