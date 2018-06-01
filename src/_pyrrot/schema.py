@@ -3,7 +3,7 @@ from http import HTTPStatus
 from marshmallow import Schema, fields
 from marshmallow.validate import OneOf
 
-METHODS = ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'PATCH', 'TRACE', 'OPTIONS']
+from .constant import METHODS
 
 
 class WhenConfigSchema(Schema):

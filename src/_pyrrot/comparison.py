@@ -3,45 +3,50 @@ import re
 
 from flask import request
 
+from .constant import REGEX_PARAM
+
 
 def comparisons(path):
-    def _compare_simple_dict(config, request):
-        if len(config.items()) == len(request.items()):
+    def _is_regex(value):
+        return str(value).startswith(REGEX_PARAM)
+
+    def _match_regex(regex, value):
+        return re.match(regex[7:].replace("\\", "\\\\"), str(value))
+
+    def _compare_simple_dict(config, _request):
+        if len(config.items()) == len(_request.items()):
             for k, v in config.items():
                 if isinstance(v, dict):
-                    return _compare_simple_dict(v, request[k])
+                    return _compare_simple_dict(v, _request[k])
                 else:
-                    if (str(v).startswith('$regex=') and not re.match(v[7:].replace("\\", "\\\\"),
-                                                                      str(request[k]))) or (
-                                not str(v).startswith('$regex=') and v != request[k]):
+                    if (_is_regex(v) and not _match_regex(v, _request[k])) or (not _is_regex(v) and v != _request[k]):
                         return False
             return True
         return False
 
-    def _compare_path(config, request):
-        if config and str(config).startswith('$regex='):
-            return re.match(config[7:].replace("\\", "\\\\"), request)
-        return config is None or request == config
+    def _compare_path(config, _request):
+        if config and _is_regex(config):
+            return _match_regex(config, _request)
+        return config is None or config == _request
 
-    def _compare_method(config, request):
-        return request == config
+    def _compare_method(config, _request):
+        return config == _request
 
-    def _compare_headers(config, request):
-        request_upper = {k.upper(): v for k, v in request.items()}
+    def _compare_headers(config, _request):
+        request_upper = {k.upper(): v for k, v in _request.items()}
         for k, v in config.items():
-            if (str(v).startswith('$regex=') and not re.match(v[7:].replace("\\", "\\\\"), request_upper[k])) or (
-                        not str(v).startswith('$regex=') and v != request_upper[k]):
+            if (_is_regex(v) and not _match_regex(v, request_upper[k])) or (not _is_regex(v) and v != request_upper[k]):
                 return False
         return True
 
-    def _compare_type(config, request):
-        return request == config
+    def _compare_type(config, _request):
+        return config == _request
 
-    def _compare_body(config, request):
-        return _compare_simple_dict(config, request)
+    def _compare_body(config, _request):
+        return _compare_simple_dict(config, _request)
 
-    def _compare_query(config, request):
-        return _compare_simple_dict(config, request)
+    def _compare_query(config, _request):
+        return _compare_simple_dict(config, _request)
 
     def compare(value):
         when = value.get('when', {})

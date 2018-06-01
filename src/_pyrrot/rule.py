@@ -3,8 +3,8 @@ from http import HTTPStatus
 from flask import jsonify
 
 from .comparison import comparisons
-
-METHODS = ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'PATCH', 'TRACE', 'OPTIONS']
+from .constant import CALL_COUNT_PARAM, CONFIG_PARAM
+from .schema import METHODS
 
 
 def register_rules(app):
@@ -18,10 +18,9 @@ def register_rules(app):
 
     @app.route('/<path:path>', methods=METHODS)
     def get_request_with_path(path):
-        selected_config = list(filter(comparisons(path), app.config['PYRROT_CONFIG']))[0]
-        selected_config['then']['header']['call_count'] = app.config['PYRROT_CALL_COUNT'][selected_config['id']] + 1
-        app.config['PYRROT_CALL_COUNT'][selected_config['id']] = app.config['PYRROT_CALL_COUNT'][
-                                                                     selected_config['id']] + 1
+        selected_config = list(filter(comparisons(path), app.config[CONFIG_PARAM]))[0]
+        selected_config['then']['header']['call_count'] = app.config[CALL_COUNT_PARAM][selected_config['id']] + 1
+        app.config[CALL_COUNT_PARAM][selected_config['id']] = app.config[CALL_COUNT_PARAM][selected_config['id']] + 1
         return _build_response(selected_config)
 
 
