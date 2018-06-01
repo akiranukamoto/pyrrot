@@ -14,7 +14,7 @@ def register_rules(app):
 
     @app.route('/', methods=METHODS)
     def get_request_without_path():
-        return ""
+        return jsonify(app.config[CONFIG_PARAM]), 200
 
     @app.route('/<path:path>', methods=METHODS)
     def get_request_with_path(path):
