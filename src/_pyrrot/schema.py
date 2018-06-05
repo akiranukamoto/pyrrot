@@ -24,8 +24,7 @@ class ThenConfigSchema(Schema):
 
 
 class ConfigSchema(Schema):
-    id = fields.String(dump_only=True)
-    name = fields.String(required=True)
+    id = fields.String(required=True)
     description = fields.String()
     when = fields.Nested(WhenConfigSchema, required=False)
     then = fields.Nested(ThenConfigSchema, required=False)

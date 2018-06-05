@@ -28,3 +28,5 @@ def test_with_wrong_headers(client, url_example_header, header):
     response = client(url_example_header).get('/users', headers=header,
                                               content_type='application/json')
     assert 404 == response.status_code
+    json_response = json.loads(response.get_data(as_text=True))
+    assert not json_response['get_users_header']['header']

@@ -25,3 +25,5 @@ def test_without_queries(client, url_example_query):
 def test_with_wrong_queries(client, url_example_query, query):
     response = client(url_example_query).get('/users{}'.format(query), content_type='application/json')
     assert 404 == response.status_code
+    json_response = json.loads(response.get_data(as_text=True))
+    assert not json_response['get_users_query']['query']

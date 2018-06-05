@@ -1,4 +1,4 @@
-- name: "Insert users"
+- id: "insert_users_body"
   description: ""
   when:
     path: users
@@ -18,7 +18,7 @@
       name: John Doe
       identity: 666
     code: 201
-- name: "Insert companies"
+- id: "get_companies_body"
   description: ""
   when:
     path: companies

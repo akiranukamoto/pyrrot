@@ -1,5 +1,4 @@
 import os
-import uuid
 
 import yaml
 
@@ -19,7 +18,6 @@ def read_configs(app, path):
             if _file_is_yaml(file):
                 configs += _load_config(os.path.join(absolute_path, file))
     for config in configs:
-        config['id'] = str(uuid.uuid4())
         app.config[CALL_COUNT_PARAM][config['id']] = 0
     app.config[CONFIG_PARAM] = configs
     return configs

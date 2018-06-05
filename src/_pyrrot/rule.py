@@ -3,7 +3,7 @@ from http import HTTPStatus
 
 from flask import jsonify, render_template
 
-from .comparison import comparisons
+from .comparison import Comparisons
 from .constant import CALL_COUNT_PARAM, CONFIG_PARAM
 from .schema import METHODS
 
@@ -13,14 +13,14 @@ def register_rules(app):
         response = []
         for config in configurations:
             response.append({'id': config['id'],
-                             'name': config['name'],
                              'call_count': app.config[CALL_COUNT_PARAM][config['id']],
                              'code': json.dumps(config, indent=4, sort_keys=True)})
         return response
 
     def _build_response(value):
-        then = value.get('then')
-        return jsonify(then.get('body')), then.get('code'), then.get('header')
+        app.config[CALL_COUNT_PARAM][value['id']] += 1
+        value['then']['header']['call_count'] = app.config[CALL_COUNT_PARAM][value['id']]
+        return jsonify(value['then'].get('body')), value['then'].get('code'), value['then'].get('header')
 
     @app.route('/', methods=METHODS)
     def get_request_without_path():
@@ -28,10 +28,11 @@ def register_rules(app):
 
     @app.route('/<path:path>', methods=METHODS)
     def get_request_with_path(path):
-        selected_config = list(filter(comparisons(path), app.config[CONFIG_PARAM]))[0]
-        selected_config['then']['header']['call_count'] = app.config[CALL_COUNT_PARAM][selected_config['id']] + 1
-        app.config[CALL_COUNT_PARAM][selected_config['id']] = app.config[CALL_COUNT_PARAM][selected_config['id']] + 1
-        return _build_response(selected_config)
+        comparison = Comparisons(path)
+        selected_config = list(filter(comparison.compare, app.config[CONFIG_PARAM]))
+        if selected_config:
+            return _build_response(selected_config[0])
+        return jsonify(comparison.result), HTTPStatus.NOT_FOUND
 
 
 def register_exceptions(app):
@@ -39,5 +40,4 @@ def register_exceptions(app):
     def exception(_):
         response = jsonify({'message': 'URL NOT FOUND'})
         response.status_code = HTTPStatus.NOT_FOUND
-        print(_)
         return response

@@ -76,7 +76,7 @@
         {% for config in configurations %}
         <li>
             <input type="checkbox" id="checkbox-{{config.id}}" name="checkbox-accordion"/>
-            <label for="checkbox-{{config.id}}">{{config.name}} - {{config.call_count}}</label>
+            <label for="checkbox-{{config.id}}">{{config.id}} - {{config.call_count}}</label>
             <div class="content">
                 <pre>{{config.code}}</pre>
             </div>

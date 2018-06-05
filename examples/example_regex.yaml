@@ -1,4 +1,4 @@
-- name: "Insert customers"
+- id: "insert_customers_regex"
   description: ""
   when:
     path: $regex=.*customers.*
@@ -17,7 +17,7 @@
       name: Coca Cola
       identity: 1234567
     code: 201
-- name: "Get customers"
+- id: "get_customers_regex"
   description: ""
   when:
     path: customers

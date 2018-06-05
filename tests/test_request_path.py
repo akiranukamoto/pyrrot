@@ -15,3 +15,6 @@ def test_with_paths(client, url_example_path):
 def test_with_wrong_paths(client, url_example_path, path):
     response = client(url_example_path).get(path, content_type='application/json')
     assert 404 == response.status_code
+    json_response = json.loads(response.get_data(as_text=True))
+    assert not json_response['get_users_path']['path']
+    assert not json_response['get_companies_path']['path']
