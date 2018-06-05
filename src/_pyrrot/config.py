@@ -11,6 +11,7 @@ def read_configs(app, path):
     configs = []
     app.config[CALL_COUNT_PARAM] = {}
     absolute_path = _validate_path(path)
+    print(absolute_path)
     if os.path.isfile(absolute_path):
         configs = _load_config(absolute_path)
     elif os.path.isdir(absolute_path):

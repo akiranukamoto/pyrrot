@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pyrrot Configuration</title>
+    <style>
+            .accordion {
+                font-family:Arial, Helvetica, sans-serif; 
+                margin:0 auto;
+                font-size:14px;
+                width:600px;
+                padding:10px;
+                background:#fff;
+            }
+            .accordion ul {
+                list-style:none;
+                margin:0;
+                padding:0;    
+            }
+            .accordion li {
+                margin:0;
+                padding:0;
+                overflow:hidden;
+                margin:0 0 1px;
+            }
+            .accordion [type=radio], .accordion [type=checkbox] {
+                display:none;
+            }
+            .accordion label {
+                display:block;
+                font-size:16px;
+                line-height:16px;
+                background:#2979FF;
+                border:1px solid #2979FF;
+                color:#fff;
+                font-weight:700;
+                cursor:pointer;
+                text-transform:uppercase;
+                padding:10px;
+            }
+            .accordion ul li label:hover, .accordion [type=radio]:checked ~ label, .accordion [type=checkbox]:checked ~ label {
+                background:#71a1f3;
+                border:1px solid #71a1f3;
+                color:#FFF;
+            }
+            .accordion [type=radio]:checked ~ label, .accordion [type=checkbox]:checked ~ label {
+                border-bottom:0;
+            }
+            .accordion [type=radio]:checked ~ label ~ .content, .accordion [type=checkbox]:checked ~ label ~ .content {
+                height:auto;
+                border:1px solid #71a1f3;
+            }
+            .accordion ul li label:hover {
+                border:1px solid #71a1f3;
+            }
+            .accordion .content {
+                padding:0 10px;
+                overflow:hidden;
+                border:1px solid #fff;
+                height:0px;
+                border-top:0;
+            }
+            .accordion p {
+                color:#333;
+                margin:0 0 10px;
+            }
+            .accordion h3 {
+                color:#542437;
+                padding:0;
+                margin:10px 0;
+            }
+    </style>
+</head>
+<body>
+<div class="accordion">
+    <ul>
+        {% for config in configurations %}
+        <li>
+            <input type="checkbox" id="checkbox-{{config.id}}" name="checkbox-accordion"/>
+            <label for="checkbox-{{config.id}}">{{config.name}} - {{config.call_count}}</label>
+            <div class="content">
+                <pre>{{config.code}}</pre>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+</body>
+</html>

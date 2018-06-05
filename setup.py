@@ -25,8 +25,11 @@ def main():
         python_requires=">=3.6",
         install_requires=install_requires,
         extras_require=extras_require,
-        packages=["_pyrrot"],
+        packages=["_pyrrot", ],
         py_modules=["pyrrot"],
+        package_data={
+            '': ['**/*.html']
+        },
         zip_safe=False
     )
 
