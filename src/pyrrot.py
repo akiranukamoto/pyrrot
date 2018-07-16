@@ -5,7 +5,7 @@ from _pyrrot.main import create_app
 
 def _create_args():
     parser = argparse.ArgumentParser(description='Foo')
-    parser.add_argument('-h', '--host', help='The host of the pyrrot. Defaults to 0.0.0.0', type=str, default='0.0.0.0')
+    parser.add_argument('-o', '--host', help='The host of the pyrrot. Defaults to 0.0.0.0', type=str, default='0.0.0.0')
     parser.add_argument('-p', '--port', help='The port of the pyrrot. Defaults to 1234', type=int, default=1234)
     requiredNamed = parser.add_argument_group('required named arguments')
     requiredNamed.add_argument('-c', '--conf', help='Directory path to read configurations', required=True)
