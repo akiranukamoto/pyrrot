@@ -43,7 +43,7 @@ class Comparisons:
         request_upper = {k.upper(): v for k, v in _request.items()}
         for k, v in config.items():
             if (self._is_regex(v) and not self._match_regex(v, request_upper.get(k.upper()))) or \
-                    (not self._is_regex(v) and v != request_upper.get(k)):
+                    (not self._is_regex(v) and v != request_upper.get(k.upper())):
                 return False
         return True
 
