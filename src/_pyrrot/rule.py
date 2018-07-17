@@ -19,8 +19,10 @@ def register_rules(app):
 
     def _build_response(value):
         app.config[CALL_COUNT_PARAM][value['id']] += 1
-        value['then']['header']['call_count'] = app.config[CALL_COUNT_PARAM][value['id']]
-        return jsonify(value['then'].get('body')), value['then'].get('code'), value['then'].get('header')
+        then_value = value['then']
+        then_value['header'] = then_value.get('header', {})
+        then_value['header']['call_count'] = app.config[CALL_COUNT_PARAM][value['id']]
+        return jsonify(then_value.get('body')), then_value.get('code'), then_value.get('header')
 
     @app.route('/', methods=METHODS)
     def get_request_without_path():
