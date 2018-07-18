@@ -6,7 +6,7 @@
     type: application/json
     header:
       TRACKID: abc123456
-      AUTHORIZATION: abacaxi
+      Authorization: abacaxi
   then:
     type: application/json
     header:
