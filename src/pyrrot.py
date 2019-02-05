@@ -1,4 +1,6 @@
 import argparse
+import os
+import os.path as path
 
 from _pyrrot.main import create_app
 
@@ -12,17 +14,33 @@ def _create_args():
     return parser.parse_args()
 
 
+def _watch_changed_files(extra_dirs):
+    extra_files = extra_dirs[:]
+    for extra_dir in extra_dirs:
+        for dirname, dirs, files in os.walk(extra_dir):
+            for filename in files:
+                filename = path.join(dirname, filename)
+                if path.isfile(filename):
+                    extra_files.append(filename)
+    return extra_files
+
+
 def main(developer_mode=False):
     conf = '../examples'
     port = 1234
     host = '0.0.0.0'
+    extra_dirs = [conf, ]
     if not developer_mode:
         args = _create_args()
         conf = args.conf
         port = args.port
         host = args.host
+        extra_dirs = [conf, ]
+
+    extra_files = _watch_changed_files(extra_dirs)
+
     app = create_app(debug=True, configuration=conf)
-    app.run(host=host, port=port)
+    app.run(host=host, port=port, extra_files=extra_files)
 
 
 if __name__ == "__main__":
