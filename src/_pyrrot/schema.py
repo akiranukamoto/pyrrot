@@ -19,7 +19,7 @@ class ThenConfigSchema(Schema):
     method = fields.String(default='GET', validate=OneOf(METHODS))
     type = fields.String(default='application/json', validate=OneOf(['application/json']))
     header = fields.Dict()
-    body = fields.Dict()
+    body = fields.Raw()
     code = fields.Int(default=HTTPStatus.OK, validate=OneOf(list(map(int, HTTPStatus))))
 
 
