@@ -29,3 +29,15 @@
     header:
       TRACKID: abc123456
     code: 200
+- id: "get_tickets"
+  description: "Example of body with an array"
+  when:
+    path: tickets
+    method: GET
+    type: application/json
+  then:
+    type: application/json
+    code: 200
+    body:
+      - ticket: "1234"
+      - ticket: "5678"

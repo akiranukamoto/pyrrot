@@ -33,3 +33,11 @@ def test_with_wrong_body(client, url_example_body, body):
     assert not json_response['insert_users_body']['body']
 
 
+def test_array_body(client, url_example_body):
+    response = client(url_example_body).get('/tickets', content_type='application/json')
+    assert 200 == response.status_code
+    json_response = json.loads(response.get_data(as_text=True))
+    assert 2 == len(json_response)
+    assert [{'ticket': '1234'}, {'ticket': '5678'}]
+
+
