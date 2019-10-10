@@ -5,14 +5,14 @@ from setuptools import setup
 def main():
     extras_require = {}
     install_requires = [
-        "PyYAML==3.12",
-        "Flask==0.11.1",
-        "marshmallow==2.9.1"
+        "pyyaml==4.2b1",
+        "flask==1.0.0",
+        "marshmallow==2.15.1"
     ]
 
     setup(
         name="pyrrot",
-        version='0.0.6',
+        version='0.1.0',
         description=u"pyrrot: É um simples serviço feito em python para simular a resposta de aplicações rest.",
         url="https://github.com/akiranukamoto/pyrrot",
         license="MIT license",
