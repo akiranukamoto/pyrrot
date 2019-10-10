@@ -3,7 +3,7 @@ import re
 
 from flask import request
 
-from .constant import REGEX_PARAM
+from .constant import REGEX_PARAM, ANY
 
 
 class Comparisons:
@@ -25,7 +25,7 @@ class Comparisons:
                 if isinstance(v, dict):
                     return self._compare_simple_dict(v, _request[k])
                 elif (self._is_regex(v) and not self._match_regex(v, _request[k])) or (
-                    not self._is_regex(v) and v != _request[k]):
+                        not self._is_regex(v) and v != _request[k]):
                     return False
             return True
         return False
@@ -52,6 +52,8 @@ class Comparisons:
         return config == _request
 
     def _compare_body(self, config, _request):
+        if config == ANY:
+            return True
         return self._compare_simple_dict(config, _request)
 
     def _compare_query(self, config, _request):
@@ -64,7 +66,7 @@ class Comparisons:
             compare_method = self._compare_method(when.get('method'), request.method)
             compare_headers = self._compare_headers(when.get('header') or {}, dict(request.headers.items()))
             compare_type = self._compare_type(when.get('type'), request.content_type)
-            compare_body = self._compare_body(when.get('body') or {}, json.loads(request.data.decode('utf8') or '{}'))
+            compare_body = self._compare_body(when.get('body') or ANY, json.loads(request.data.decode('utf8') or '{}'))
             compare_query = self._compare_query(when.get('query') or {}, request.args.to_dict())
             if compare_path and compare_method and compare_headers and compare_type and compare_body and compare_query:
                 return True

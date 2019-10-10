@@ -7,8 +7,7 @@ def test_with_body(client, url_example_body):
         'name': 'John Doe', 'identity': 666, 'address': {
             'number': 321,
             'street': 'White River'
-        }}),
-                                             content_type='application/json')
+        }}), content_type='application/json')
     data = json.loads(response.get_data(as_text=True))
     assert 201 == response.status_code
     assert 'abc123456' == response.headers['TRACKID']
@@ -20,6 +19,17 @@ def test_without_body(client, url_example_body):
     response = client(url_example_body).get('/companies', content_type='application/json')
     assert 200 == response.status_code
     assert 'abc123456' == response.headers['TRACKID']
+
+
+def test_without_body_with_post(client, url_example_body):
+    response = client(url_example_body).post('/companies', data=json.dumps({
+        'name': 'John Doe', 'identity': 666, 'address': {
+            'number': 321,
+            'street': 'White River'
+        }}), content_type='application/json')
+    assert 200 == response.status_code
+    json_response = json.loads(response.get_data(as_text=True))
+    assert [{'ticket': '1234'}, {'ticket': '5678'}] == json_response
 
 
 @pytest.mark.parametrize('body', [json.dumps({'name': 'John Doe', 'identity': 999}),
@@ -38,6 +48,4 @@ def test_array_body(client, url_example_body):
     assert 200 == response.status_code
     json_response = json.loads(response.get_data(as_text=True))
     assert 2 == len(json_response)
-    assert [{'ticket': '1234'}, {'ticket': '5678'}]
-
-
+    assert [{'ticket': '1234'}, {'ticket': '5678'}] == json_response
