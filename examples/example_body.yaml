@@ -41,3 +41,15 @@
     body:
       - ticket: "1234"
       - ticket: "5678"
+- id: "insert_companies_body"
+  description: "Example of without body"
+  when:
+    path: companies
+    method: POST
+    type: application/json
+  then:
+    type: application/json
+    code: 200
+    body:
+      - ticket: "1234"
+      - ticket: "5678"
