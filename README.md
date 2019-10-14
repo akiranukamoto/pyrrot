@@ -1,10 +1,17 @@
 # Pyrrot
 
 Pyrrot é um simples serviço feito em python para simular a resposta de aplicações rest.
+
+## Instalação
 ```
-    $ pip install pyrrot
+    $ pip install pyrrot   
+```
+
+## Rodar applicação
+```    
     $ pyrrot -c caminho_das_configuracoes
 ```
+
 ## Setup Local
 
 Assumindo que você tenha o python 3.6 instalado.
@@ -25,7 +32,7 @@ Assumindo que você tenha o python 3.6 instalado.
 
 ## Executar testes
 
-    $ pytest tests/
+    $ make tests
 
 ## Configuração (yml)
 

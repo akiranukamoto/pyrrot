@@ -5,7 +5,8 @@ from flask import json
 @pytest.mark.parametrize("path, header, body",
                          [("/special_customers", "simple_access", {'name': 'coca cola', 'identity': 3}),
                           ("/customers_is_special", "access_foo", {'name': 'Pepsi Cola', 'identity': 8}),
-                          ("/before_customers_after", "simple_access_bar", {'name': 'Cola', 'identity': 10})
+                          ("/before_customers_after", "simple_access_bar", {'name': 'Cola', 'identity': 10}),
+                          ("/profile/123/accounts/123", "simple_access_bar", {'name': 'Cola', 'identity': 10})
                           ])
 def test_with_regex(client, url_example_regex, path, header, body):
     response = client(url_example_regex).post(path, data=json.dumps(body),

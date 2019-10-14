@@ -33,3 +33,22 @@
       name: Coca Cola
       identity: 1234567
     code: 200
+- id: "insert_profile_regex_path"
+  description: ""
+  when:
+    path: $regex=^profile/.*/accounts/.*$
+    method: POST
+    type: application/json
+    header:
+      TRACKID: $regex=.*access.*
+    body:
+      name: $regex=(?i).*Cola.*
+      identity: $regex=^([2-9]|1[0-6])$
+  then:
+    type: application/json
+    header:
+      TRACKID: abc123456
+    body:
+      name: Coca Cola
+      identity: 1234567
+    code: 201
