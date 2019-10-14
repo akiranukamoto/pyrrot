@@ -12,7 +12,7 @@ def main():
 
     setup(
         name="pyrrot",
-        version='0.1.1',
+        version='0.2.1',
         description=u"pyrrot: É um simples serviço feito em python para simular a resposta de aplicações rest.",
         url="https://github.com/akiranukamoto/pyrrot",
         license="MIT license",
