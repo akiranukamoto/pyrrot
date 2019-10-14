@@ -1,20 +1,31 @@
+import datetime
 import json
 from http import HTTPStatus
 
-from flask import jsonify, render_template
+from flask import jsonify, render_template, request
 
 from .comparison import Comparisons
 from .constant import CALL_COUNT_PARAM, CONFIG_PARAM
 from .schema import METHODS
 
 
+class JSONEncoder(json.JSONEncoder):
+
+    def default(self, obj):
+        if isinstance(obj, datetime.datetime):
+            return obj.isoformat()
+        return super(JSONEncoder, self).default(obj)
+
+
 def register_rules(app):
-    def _build_template(configurations):
+    def _build_template(configurations, output=None):
         response = []
         for config in configurations:
-            response.append({'id': config['id'],
-                             'call_count': app.config[CALL_COUNT_PARAM][config['id']],
-                             'code': json.dumps(config, indent=4, sort_keys=True)})
+            data = {'id': config['id'],
+                    'call_count': app.config[CALL_COUNT_PARAM][config['id']]}
+            if not output:
+                data['code'] = json.dumps(config, indent=4, sort_keys=True, cls=JSONEncoder)
+            response.append(data)
         return response
 
     def _build_response(value):
@@ -26,6 +37,9 @@ def register_rules(app):
 
     @app.route('/', methods=METHODS)
     def get_request_without_path():
+        output_format = request.args.get('output', '')
+        if output_format == 'json':
+            return jsonify(_build_template(app.config[CONFIG_PARAM], output_format))
         return render_template('config.html', configurations=_build_template(app.config[CONFIG_PARAM]))
 
     @app.route('/<path:path>', methods=METHODS)
