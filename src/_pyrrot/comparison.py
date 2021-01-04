@@ -6,11 +6,7 @@ from flask import request
 from .constant import REGEX_PARAM, ANY
 
 
-class Comparisons:
-    def __init__(self, path):
-        self.path = path
-        self.result = {}
-
+class RegexBase:
     @staticmethod
     def _is_regex(value):
         return str(value).startswith(REGEX_PARAM)
@@ -18,6 +14,12 @@ class Comparisons:
     @staticmethod
     def _match_regex(regex, value):
         return re.match(regex[7:].replace("\\", "\\\\"), str(value))
+
+
+class Comparisons(RegexBase):
+    def __init__(self, path):
+        self.path = path
+        self.result = {}
 
     def _compare_simple_dict(self, config, _request):
         if len(config.items()) == len(_request.items()):

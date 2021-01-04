@@ -1,10 +1,13 @@
 import datetime
 import json
+import copy
+
 from http import HTTPStatus
 
 from flask import jsonify, render_template, request
 
 from .comparison import Comparisons
+from .response_builder import ResponseBuilder
 from .constant import CALL_COUNT_PARAM, CONFIG_PARAM
 from .schema import METHODS
 
@@ -33,7 +36,9 @@ def register_rules(app):
         then_value = value['then']
         then_value['header'] = then_value.get('header', {})
         then_value['header']['call_count'] = app.config[CALL_COUNT_PARAM][value['id']]
-        return jsonify(then_value.get('body')), then_value.get('code'), then_value.get('header')
+
+        body = ResponseBuilder(then_value.get('body'))
+        return jsonify(body.generate()), then_value.get('code'), then_value.get('header')
 
     @app.route('/', methods=METHODS)
     def get_request_without_path():
@@ -47,7 +52,8 @@ def register_rules(app):
         comparison = Comparisons(path)
         selected_config = list(filter(comparison.compare, app.config[CONFIG_PARAM]))
         if selected_config:
-            return _build_response(selected_config[0])
+            config = copy.deepcopy(selected_config[0])
+            return _build_response(config)
         return jsonify(comparison.result), HTTPStatus.NOT_FOUND
 
 
