@@ -1,3 +1,5 @@
+import re
+
 import pytest
 from flask import json
 
@@ -17,6 +19,19 @@ def test_with_regex(client, url_example_regex, path, header, body):
     assert 'abc123456' == response.headers['TRACKID']
     assert 'Coca Cola' == data['name']
     assert 1234567 == data['identity']
+
+
+def test_with_body_regex(client, url_example_regex):
+    response = client(url_example_regex).post('profile-body-regex/', data=json.dumps({'name': 'Cola', 'identity': 10}),
+                                              headers={'TRACKID': 'simple_access_bar'},
+                                              content_type='application/json')
+    data = json.loads(response.get_data(as_text=True))
+    assert 201 == response.status_code
+    assert 'abc123456' == response.headers['TRACKID']
+    assert 'Coca Cola' == data['name']
+    assert 1234567 == data['identity']
+    uuid_regex = r'^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$'
+    assert re.match(uuid_regex, str(data["id"]))
 
 
 @pytest.mark.parametrize("query",

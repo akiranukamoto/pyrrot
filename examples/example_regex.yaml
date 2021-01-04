@@ -52,3 +52,23 @@
       name: Coca Cola
       identity: 1234567
     code: 201
+- id: "insert_profile_regex_body"
+  description: ""
+  when:
+    path: $regex=^profile-body-regex/$
+    method: POST
+    type: application/json
+    header:
+      TRACKID: $regex=.*access.*
+    body:
+      name: $regex=(?i).*Cola.*
+      identity: $regex=^([2-9]|1[0-6])$
+  then:
+    type: application/json
+    header:
+      TRACKID: abc123456
+    body:
+      id: $regex=^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
+      name: Coca Cola
+      identity: 1234567
+    code: 201
