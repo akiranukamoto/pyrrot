@@ -6,7 +6,8 @@ def main():
     install_requires = [
         "pyyaml==4.2b1",
         "flask==1.0.0",
-        "marshmallow==2.15.1"
+        "marshmallow==2.15.1",
+        "rstr==2.2.6"
     ]
 
     setup(
