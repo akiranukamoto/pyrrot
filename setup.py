@@ -4,7 +4,7 @@ from setuptools import setup
 def main():
     extras_require = {}
     install_requires = [
-        "pyyaml==4.2b1",
+        "pyyaml==5.4",
         "flask==1.0.0",
         "marshmallow==2.15.1"
     ]
